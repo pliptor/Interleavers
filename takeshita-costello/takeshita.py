@@ -17,8 +17,14 @@ import sys
 def CheckCmdLine():
     if len(sys.argv) != 2:
         print("\n\nUsage: {} Interleaver_Length=2^n \n".format(sys.argv[0]))
-        return 0 
-    return int(sys.argv[1]) 
+        return -1 
+    else:
+        length = int(sys.argv[1])
+        if bin(length).count("1") == 1:
+            return length 
+        else:
+            print("{} is not a power of 2".format(length))
+            return -1
 #----------------------------------------------------------------------
 def PrintResult(a):
     for i in a:
@@ -43,7 +49,7 @@ def GenerateDT(Length, Step, DShift, CShift):
 # MAIN
 if __name__ == "__main__":
     Length = CheckCmdLine()
-    if Length != 0:
+    if Length != -1:
         Step   = 1              # default coefficient of permuter (k in the paper);
         DShift = 0              # default diagonal shift of the permuter
         CShift = int(Length/2); # default cyclic shift of the permuter
