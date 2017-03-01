@@ -1,5 +1,7 @@
 # Interleavers
 
+<img src="https://travis-ci.org/pliptor/Interleavers.svg?branch=master">
+
 ## A collection of tools for permutation and interleaver generation.
 
 ### takeshita-costello folder
