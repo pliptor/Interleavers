@@ -1,31 +1,33 @@
 /* (C) Oscar. Y. Takeshita 2017 */
 #include <vector>
 #include <algorithm>
+#include <cassert>
+#include <random>
 typedef unsigned int uint32;
-using namespace std;
 class Random {
 	public:
 		Random() = default;
 		Random(std::mt19937::result_type seed) : eng(seed) {}
-		uint32 DrawNumber(uint32 min, uint32 max) {
-			return std::uniform_int_distribution<uint32>{min, max}(eng);
+		void shuffle_vec(std::vector<int> &v) {
+			std::shuffle(v.begin(), v.end(), eng);
 		}
 	private:        
 		std::mt19937 eng{std::random_device{}()};
 };
 
 int main (int argc, char *argv[]) {
-	int N;
+	int N; // interleaver length
 	if (argc == 1 ) 
 		N = 1024;
 	else
 		if(argc == 2 )
 			N = atoi(argv[1]);
+	assert(N>0);
 
-	vector<int> inter(N);
+	std::vector<int> inter(N);
 	Random r;
 	/* S is the spread value */
-	/* Typically choose S<sqrt(N/2) */
+	/* Typically S<sqrt(N/2) for convergence */
 	int S = floor(sqrt((double)N/2.)), p;
 	int count, point, trials;
 	bool done = false;
@@ -34,26 +36,28 @@ int main (int argc, char *argv[]) {
 
 	while(!done) {
 		/* build pool */
-		vector <int> pool;
+		std::vector <int> pool;
 		for(int i = 0; i <N; i++)
 			pool.push_back(i);
+		/* shuffle */
+		r.shuffle_vec(pool);
 		count  = 0;
 		trials = 0;
-		//fprintf(stderr,"trying\n");
+		p      = 0;
+		//fprintf(stderr, "trying\n");
 		while (count<N) {
-			/* choose index */
-			p = r.DrawNumber(0,pool.size()-1);
-			/* check if the selected integer is within
-			   +/-s of all previously selected */
+			if (p >= pool.size())
+				p = 0;
 			found = true;
 			for(point = count-S; point<count; point++) {
 				if((point >-1) && (abs(pool[p]-inter[point])<S)){
 					found = false;
+					p++;
 					break;
 				}
 			}
 			if(found) {
-				/* fprintf(stderr,"%d %d\n",count,pool[p]);  */
+				/* fprintf(stderr, "%d %d\n" ,count, pool[p]);  */
 				inter[count] = *(pool.begin()+p);
 				/* delete chosen element from the pool */
 				pool.erase(pool.begin()+p);
@@ -61,7 +65,7 @@ int main (int argc, char *argv[]) {
 				done = (count == N);
 			}
 			trials++;
-			if(trials>100*N)
+			if(trials>100*N) // It hasn't converged. Restart.
 				break;
 			if(done)
 				break;
@@ -72,7 +76,5 @@ int main (int argc, char *argv[]) {
 	   for(int i = 0; i< N; i++) // information order for the first constituent code 
 	   printf("%d\n",i);
 	 */
-	for_each(inter.begin(), inter.end(), [](int p) { // information order for the second constintuent code
-			printf("%d\n",p);
-			});
-}
+	for(auto i : inter) { printf("%d\n", i); }; // information order for the second constintuent code
+	}
