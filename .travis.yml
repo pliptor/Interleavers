@@ -1,2 +1,1 @@
-compiler:
-  - g++
+language: cpp
