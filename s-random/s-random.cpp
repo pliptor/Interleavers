@@ -4,18 +4,10 @@
 #include <cassert>
 #include <random>
 typedef unsigned int uint32;
-class Random {
-	public:
-		Random() = default;
-		Random(std::mt19937::result_type seed) : eng(seed) {}
-		void shuffle_vec(std::vector<int> &v) {
-			std::shuffle(v.begin(), v.end(), eng);
-		}
-	private:        
-		std::mt19937 eng{std::random_device{}()};
-};
 
 int main (int argc, char *argv[]) {
+	std::random_device device;
+	std::mt19937 generator(device());
 	int N; // interleaver length
 	if (argc == 1 ) 
 		N = 1024;
@@ -25,7 +17,6 @@ int main (int argc, char *argv[]) {
 	assert(N>0);
 
 	std::vector<int> inter(N);
-	Random r;
 	/* S is the spread value */
 	/* Typically S<sqrt(N/2) for convergence */
 	int S = floor(sqrt((double)N/2.)), p;
@@ -40,7 +31,7 @@ int main (int argc, char *argv[]) {
 		for(int i = 0; i <N; i++)
 			pool.push_back(i);
 		/* shuffle */
-		r.shuffle_vec(pool);
+		std::shuffle(pool.begin(), pool.end(), generator);
 		count  = 0;
 		trials = 0;
 		p      = 0;
@@ -77,4 +68,4 @@ int main (int argc, char *argv[]) {
 	   printf("%d\n",i);
 	 */
 	for(auto i : inter) { printf("%d\n", i); }; // information order for the second constintuent code
-	}
+}
