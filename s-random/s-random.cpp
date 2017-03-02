@@ -1,8 +1,9 @@
 /* (C) Oscar. Y. Takeshita 2017 */
-#include <vector>
 #include <algorithm>
 #include <cassert>
+#include <limits>
 #include <random>
+#include <vector>  
 typedef unsigned int uint32;
 
 int main (int argc, char *argv[]) {
@@ -10,11 +11,14 @@ int main (int argc, char *argv[]) {
 	std::mt19937 generator(device());
 	int N; // interleaver length
 	if (argc == 1 ) 
-		N = 1024;
+		N = 1024; 
 	else
 		if(argc == 2 )
 			N = atoi(argv[1]);
-	assert(N>0);
+	if(N<0 || N>(1<<20)) {
+		fprintf(stderr, "Interleaver length must be betwen 1 and %d\n",(1<<20));
+		return -1;
+	}
 
 	std::vector<int> inter(N);
 	/* S is the spread value */
@@ -23,7 +27,7 @@ int main (int argc, char *argv[]) {
 	int count, point, trials;
 	bool done = false;
 	bool found;
-	fprintf(stderr,"Trying spread %d\n",S);
+	fprintf(stderr, "Trying spread %d\n",S);
 
 	while(!done) {
 		/* build pool */
