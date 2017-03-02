@@ -1,8 +1,12 @@
 # Interleavers
-Tools for permutation and interleaver generation.
 
-The takeshita-costello folder contains scripts
-for the generation of takeshita-costello interleavers.
+<img src="https://travis-ci.org/pliptor/Interleavers.svg?branch=master">
 
-These interleavers are also part of Matlab(R).
+## A collection of tools for permutation and interleaver generation.
 
+### takeshita-costello folder
+Contains perl and python scripts for the generation of takeshita-costello interleavers.
+These interleavers are can be found in the communications toolbox of Matlab(R).
+
+### s-random folder
+C++ program for the generation of s-random interleavers.
