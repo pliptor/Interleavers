@@ -10,3 +10,5 @@ These interleavers are can be found in the communications toolbox of Matlab(R).
 
 ### s-random folder
 C++ program for the generation of s-random interleavers.
+[S. Dolinar and D. Divsalar, "Weight Distributions for Turbo Codes Using Random and Nonrandom Permutations,"
+NASA Code 315-91-20-20-53](http://ipnpr.jpl.nasa.gov/progress_report/42-122/122B.pdf)

@@ -1,4 +1,7 @@
-/* (C) Oscar. Y. Takeshita 2017 */
+// (C) Oscar. Y. Takeshita 2017 
+//
+//  S-random interleavers 
+//  http://ipnpr.jpl.nasa.gov/progress_report/42-122/122B.pdf
 #include <algorithm>
 #include <cassert>
 #include <limits>
@@ -11,11 +14,11 @@ int main (int argc, char *argv[]) {
 	std::mt19937 generator(device());
 	int N; // interleaver length
 	if (argc == 1 ) 
-		N = 1024; 
+		N = 128; 
 	else
 		if(argc == 2 )
 			N = atoi(argv[1]);
-	if(N<0 || N>(1<<20)) {
+	if(N<=0 || N>(1<<20)) {
 		fprintf(stderr, "Interleaver length must be betwen 1 and %d\n",(1<<20));
 		return -1;
 	}
