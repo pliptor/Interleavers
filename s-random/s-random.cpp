@@ -7,48 +7,46 @@
 #include <limits>
 #include <random>
 #include <vector>  
-typedef unsigned int uint32;
 
 int main (int argc, char *argv[]) {
 	std::random_device device;
 	std::mt19937 generator(device());
-	int N; // interleaver length
-	if (argc == 1 ) 
+	int32_t N; // interleaver length
+	if (argc == 1 ) // set default interleaver length if no argument is given
 		N = 128; 
 	else
 		if(argc == 2 )
-			N = atoi(argv[1]);
+			N = static_cast<int32_t>(atoi(argv[1]));
 	if(N<=0 || N>(1<<20)) {
-		fprintf(stderr, "Interleaver length must be betwen 1 and %d\n",(1<<20));
+		fprintf(stderr, "Interleaver length must be betwen 1 and %d\n", (1<<20));
 		return -1;
 	}
 
-	std::vector<int> inter(N);
+	std::vector<int32_t> inter(N);
 	/* S is the spread value */
 	/* Typically S<sqrt(N/2) for convergence */
-	int S = floor(sqrt((double)N/2.)), p;
-	int count, point, trials;
-	bool done = false;
-	bool found;
+	int32_t S = floor(sqrt(static_cast<double>(N)/2.)), p;
+	int32_t count, trials;
 	fprintf(stderr, "Trying spread %d\n",S);
 
-	while(!done) {
+	while(true) {
 		/* build pool */
-		std::vector <int> pool;
-		for(int i = 0; i <N; i++)
+		std::vector <uint32_t> pool;
+		for(int32_t i = 0; i <N; i++)
 			pool.push_back(i);
 		/* shuffle */
 		std::shuffle(pool.begin(), pool.end(), generator);
 		count  = 0;
-		trials = 0;
-		p      = 0;
+		trials = N;
+		auto p = pool.begin(); // points to candidate in the pool
 		//fprintf(stderr, "trying\n");
-		while (count<N) {
-			if (p >= pool.size())
-				p = 0;
-			found = true;
-			for(point = count-S; point<count; point++) {
-				if((point >-1) && (abs(pool[p]-inter[point])<S)){
+		while (!pool.empty() && trials--) {
+			if (p == pool.end()) 
+				p = pool.begin();
+			bool found = true;
+			// Here we do the S-interleaver constraint check
+			for(auto p2 = inter.begin() + std::max(0, count-S); p2< inter.begin()+count; p2++) { // test if for all previous (domain) S values
+				if(abs(*p - *p2) < S){ // the interleved (image) values follows constraint
 					found = false;
 					p++;
 					break;
@@ -56,18 +54,15 @@ int main (int argc, char *argv[]) {
 			}
 			if(found) {
 				/* fprintf(stderr, "%d %d\n" ,count, pool[p]);  */
-				inter[count] = *(pool.begin()+p);
+				inter[count] = *p;
 				/* delete chosen element from the pool */
-				pool.erase(pool.begin()+p);
+				pool.erase(p);
 				count++;
-				done = (count == N);
+				trials = N-count;
 			}
-			trials++;
-			if(trials>100*N) // It hasn't converged. Restart.
-				break;
-			if(done)
-				break;
 		}
+		if(pool.empty()) // terminate when interleaver is done (pool is empty)
+			break;
 	}
 	/*
 	   printf("%d 2\n",N);       // interleaver length and number of constituent codes 
